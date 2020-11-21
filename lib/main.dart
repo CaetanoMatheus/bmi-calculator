@@ -32,6 +32,30 @@ class _HomeScreenState extends State<HomeScreen> {
           )
         ],
       ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Icon(Icons.person_outline, size: 120, color: Colors.pink),
+          TextField(
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              labelText: 'Peso (kg)',
+              labelStyle: TextStyle(color: Colors.pink),
+            ),
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 25),
+          ),
+          TextField(
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              labelText: 'Altura (cm)',
+              labelStyle: TextStyle(color: Colors.pink),
+            ),
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 25),
+          )
+        ],
+      ),
     );
   }
 }
