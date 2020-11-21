@@ -18,6 +18,55 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  String _infoText = 'Informe seus dados.';
+
+  TextEditingController weightController = TextEditingController();
+  TextEditingController heightController = TextEditingController();
+
+  void _resetFields() {
+    this.weightController.text = '';
+    this.heightController.text = '';
+    setState(() {
+      this._infoText = 'Informe seus dados.';
+    });
+  }
+
+  void _calculate() {
+    double weight = double.parse(this.weightController.text);
+    double height = double.parse(this.heightController.text) / 100;
+    double imc = weight / (height * height);
+    setState(() {
+      if (imc < 18.6) {
+        return this._infoText =
+            'Abaixo do peso (${imc.toStringAsPrecision(3)})';
+      }
+
+      if (imc >= 18.6 && imc < 24.9) {
+        return this._infoText = 'Peso Ideal (${imc.toStringAsPrecision(3)})';
+      }
+
+      if (imc >= 24.9 && imc < 29.9) {
+        return this._infoText =
+            'Levemente acima do peso (${imc.toStringAsPrecision(3)})';
+      }
+
+      if (imc >= 29.9 && imc < 34.9) {
+        return this._infoText =
+            'Obesidade grau I (${imc.toStringAsPrecision(3)})';
+      }
+
+      if (imc >= 34.9 && imc < 39.9) {
+        return this._infoText =
+            'Obesidade grau II (${imc.toStringAsPrecision(3)})';
+      }
+
+      if (imc >= 40) {
+        return this._infoText =
+            'Obesidade grau III (${imc.toStringAsPrecision(3)})';
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.refresh),
-            onPressed: () {},
+            onPressed: this._resetFields,
           )
         ],
       ),
@@ -46,6 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 25),
+              controller: this.weightController,
             ),
             TextField(
               keyboardType: TextInputType.number,
@@ -55,13 +105,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 25),
+              controller: this.heightController,
             ),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 20),
               child: Container(
                 height: 50,
                 child: RaisedButton(
-                  onPressed: () {},
+                  onPressed: this._calculate,
                   child: Text(
                     'Calcular',
                     style: TextStyle(color: Colors.white, fontSize: 25),
@@ -71,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             Text(
-              'Info',
+              this._infoText,
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.green, fontSize: 25),
             ),
