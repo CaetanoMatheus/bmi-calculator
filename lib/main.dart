@@ -19,52 +19,45 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String _infoText = 'Informe seus dados.';
-
+  GlobalKey<FormState> _formKey = GlobalKey();
   TextEditingController weightController = TextEditingController();
   TextEditingController heightController = TextEditingController();
 
   void _resetFields() {
     this.weightController.text = '';
     this.heightController.text = '';
-    setState(() {
-      this._infoText = 'Informe seus dados.';
-    });
+    setState(() => this._infoText = 'Informe seus dados.');
+  }
+
+  String _getBMIValue(double value) {
+    if (value < 18.6) return 'Abaixo do peso (${this._formatBMI(value)})';
+
+    if (value >= 18.6 && value < 24.9)
+      return 'Peso Ideal (${this._formatBMI(value)})';
+
+    if (value >= 24.9 && value < 29.9)
+      return 'Levemente acima do peso (${this._formatBMI(value)})';
+
+    if (value >= 29.9 && value < 34.9)
+      return 'Obesidade grau I (${this._formatBMI(value)})';
+
+    if (value >= 34.9 && value < 39.9)
+      return 'Obesidade grau II (${this._formatBMI(value)})';
+
+    return 'Obesidade grau III (${this._formatBMI(value)})';
+  }
+
+  String _formatBMI(double value) => value.toStringAsPrecision(3);
+
+  double _calculateBMI(double weight, double height) {
+    return weight / (height * height);
   }
 
   void _calculate() {
     double weight = double.parse(this.weightController.text);
     double height = double.parse(this.heightController.text) / 100;
-    double imc = weight / (height * height);
-    setState(() {
-      if (imc < 18.6) {
-        return this._infoText =
-            'Abaixo do peso (${imc.toStringAsPrecision(3)})';
-      }
-
-      if (imc >= 18.6 && imc < 24.9) {
-        return this._infoText = 'Peso Ideal (${imc.toStringAsPrecision(3)})';
-      }
-
-      if (imc >= 24.9 && imc < 29.9) {
-        return this._infoText =
-            'Levemente acima do peso (${imc.toStringAsPrecision(3)})';
-      }
-
-      if (imc >= 29.9 && imc < 34.9) {
-        return this._infoText =
-            'Obesidade grau I (${imc.toStringAsPrecision(3)})';
-      }
-
-      if (imc >= 34.9 && imc < 39.9) {
-        return this._infoText =
-            'Obesidade grau II (${imc.toStringAsPrecision(3)})';
-      }
-
-      if (imc >= 40) {
-        return this._infoText =
-            'Obesidade grau III (${imc.toStringAsPrecision(3)})';
-      }
-    });
+    double imc = this._calculateBMI(weight, height);
+    setState(() => this._infoText = this._getBMIValue(imc));
   }
 
   @override
@@ -83,50 +76,59 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Icon(Icons.person_outline, size: 120, color: Colors.green),
-            TextField(
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Peso (kg)',
-                labelStyle: TextStyle(color: Colors.green),
+        child: Form(
+          key: this._formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Icon(Icons.person_outline, size: 120, color: Colors.green),
+              TextFormField(
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Peso (kg)',
+                  labelStyle: TextStyle(color: Colors.green),
+                ),
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 25),
+                controller: this.weightController,
+                validator: (value) => value.isEmpty ? 'Insira o peso' : null,
               ),
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 25),
-              controller: this.weightController,
-            ),
-            TextField(
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Altura (cm)',
-                labelStyle: TextStyle(color: Colors.green),
+              TextFormField(
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Altura (cm)',
+                  labelStyle: TextStyle(color: Colors.green),
+                ),
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 25),
+                controller: this.heightController,
+                validator: (value) => value.isEmpty ? 'Insira a altura' : null,
               ),
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 25),
-              controller: this.heightController,
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 20),
-              child: Container(
-                height: 50,
-                child: RaisedButton(
-                  onPressed: this._calculate,
-                  child: Text(
-                    'Calcular',
-                    style: TextStyle(color: Colors.white, fontSize: 25),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 20),
+                child: Container(
+                  height: 50,
+                  child: RaisedButton(
+                    onPressed: () {
+                      if (this._formKey.currentState.validate()) {
+                        this._calculate();
+                      }
+                    },
+                    child: Text(
+                      'Calcular',
+                      style: TextStyle(color: Colors.white, fontSize: 25),
+                    ),
+                    color: Colors.green,
                   ),
-                  color: Colors.green,
                 ),
               ),
-            ),
-            Text(
-              this._infoText,
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.green, fontSize: 25),
-            ),
-          ],
+              Text(
+                this._infoText,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.green, fontSize: 25),
+              ),
+            ],
+          ),
         ),
       ),
     );
